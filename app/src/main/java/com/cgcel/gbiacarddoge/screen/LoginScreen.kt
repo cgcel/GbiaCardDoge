@@ -60,7 +60,7 @@ import java.util.Base64
 @Composable
 fun LoginPage(navController: NavHostController) {
     val context = LocalContext.current
-    val store = UserStore(context)
+    val datastore = UserStore(context)
     val scope = rememberCoroutineScope()
 
     var phoneNumber by remember { mutableStateOf("") }
@@ -187,28 +187,22 @@ fun LoginPage(navController: NavHostController) {
                             val decodePayloadJson = JSON.parseObject(decodedPayloadString)
                             val phyCardId = decodePayloadJson?.getString("physicalCardId")
                             val userName = decodePayloadJson?.getString("userName")
+                            val userId = decodePayloadJson?.getString("userId")
                             val sessionID =
                                 respJsonData.getJSONObject("data").getString("sessionID")
                             val code = respJsonData.getIntValue("code")
 
-//                            CoroutineScope(Dispatchers.IO).launch {
-//                                store.saveUserToken(token)
-//                                store.saveUserSessionID(sessionID)
-//                                if (physicalCardId != null) {
-//                                    store.saveUserPhyCardId(physicalCardId)
-//                                }
-//                                if (userName != null) {
-//                                    store.saveUserName(userName)
-//                                }
-//                            }
                             scope.launch {
-                                store.saveUserToken(token)
-                                store.saveUserSessionID(sessionID)
+                                datastore.saveUserToken(token)
+                                datastore.saveUserSessionID(sessionID)
                                 if (phyCardId != null) {
-                                    store.saveUserPhyCardId(phyCardId)
+                                    datastore.saveUserPhyCardId(phyCardId)
                                 }
                                 if (userName != null) {
-                                    store.saveUserName(userName)
+                                    datastore.saveUserName(userName)
+                                }
+                                if (userId != null){
+                                    datastore.saveUserId(userId)
                                 }
                             }
 

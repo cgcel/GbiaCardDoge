@@ -17,6 +17,7 @@ class UserStore(private val context: Context) {
         private val USER_SESSIONID = stringPreferencesKey("user_sessionID")
         private val USER_PHYCARDID = stringPreferencesKey("user_phyCardId")
         private val USER_NAME = stringPreferencesKey("user_name")
+        private val USER_ID = stringPreferencesKey("user_id")
     }
 
     val getUserToken: Flow<String> = context.dataStore.data.map { preferences ->
@@ -30,6 +31,9 @@ class UserStore(private val context: Context) {
     }
     val getUserName: Flow<String> = context.dataStore.data.map { preferences ->
         preferences[USER_NAME] ?: ""
+    }
+    val getUserId: Flow<String> = context.dataStore.data.map { preferences ->
+        preferences[USER_ID] ?: ""
     }
 
     suspend fun saveUserToken(token: String) {
@@ -53,6 +57,12 @@ class UserStore(private val context: Context) {
     suspend fun saveUserName(userName: String) {
         context.dataStore.edit { preferences ->
             preferences[USER_NAME] = userName
+        }
+    }
+
+    suspend fun saveUserId(userId: String) {
+        context.dataStore.edit { preferences ->
+            preferences[USER_ID] = userId
         }
     }
 }

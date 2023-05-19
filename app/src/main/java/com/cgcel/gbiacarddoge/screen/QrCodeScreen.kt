@@ -122,13 +122,11 @@ fun ShowQrCodePage(
 
     var isLogin by remember { mutableStateOf(true) }
 
-    var formatUserName = Util().formatUserName(savedUserName)
+    val formatUserName = Util().formatUserName(savedUserName)
 
     var bitmap by remember {
         mutableStateOf(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888))
     }
-
-//    val imageBitmap: ImageBitmap = bitmap.asImageBitmap()
 
     var showFavDialog by remember { mutableStateOf(false) }
     var showInfoDialog by remember { mutableStateOf(false) }
@@ -168,7 +166,6 @@ fun ShowQrCodePage(
             )
         },
 
-
         bottomBar = {
             BottomAppBar(
                 actions = {
@@ -185,20 +182,7 @@ fun ShowQrCodePage(
                 floatingActionButton = {
                     FloatingActionButton(
                         onClick = {
-                            /* do something */
-//                            println("token2: ${savedToken}, sessionID2: ${savedSessionID}")
-//                            CoroutineScope(Dispatchers.Main).launch {
-//                                httpHelper.refreshQrCode(savedToken, savedSessionID).fold(
-//                                    onSuccess = { result ->
-//                                        bitmap = BitmapFactory.decodeStream(result)
-//                                    },
-//                                    onFailure = { error ->
-////                                    println("Error: ${e.message}")
-//                                    }
-//                                )
-//                            }
                             if (savedToken.isNotEmpty() && savedSessionID.isNotEmpty()) {
-
                                 val url =
                                     "http://ykt.baiyunairport.com/ykt/homepage/qrcode?codeContent=${savedPhyCardId}"
                                 val request = Request.Builder().url(url)
@@ -249,19 +233,7 @@ fun ShowQrCodePage(
     }
 
     LaunchedEffect(Unit) {
-//        store.getUserToken.combine(store.getUserSessionID) { token, sessionID ->
-//            Pair(token, sessionID)
-//        }.collect { (token, sessionID) ->
-//            if (token.isNotEmpty() && sessionID.isNotEmpty()) {
-//                isLoading = false
-//                savedToken = token
-//                savedSessionID = sessionID
-        // 两个参数都已经读取成功，执行进一步操作
-
-//        println("token0: ${savedToken}, sessionID0: ${savedSessionID}")
-
         if (savedToken.isNotEmpty() && savedSessionID.isNotEmpty()) {
-
             val url = "http://ykt.baiyunairport.com/ykt/orderFood/showOrderFood"
             val request =
                 Request.Builder().url(url).addHeader("Host", "ykt.baiyunairport.com")
@@ -297,13 +269,6 @@ fun ShowQrCodePage(
         } else {
             isLogin = false
         }
-
-//            } else {
-//                // println("token, sessionID is empty: ${savedToken}, ${savedSessionID}")
-//                isLogin = false
-//            }
-//        }
-
     }
 
 
@@ -311,29 +276,7 @@ fun ShowQrCodePage(
         if (!isLogin) {
             navController.navigate("login")
         } else {
-            // token有效时, 直接显示一卡通码
-//            store.getUserToken.combine(store.getUserSessionID) { token, sessionID ->
-//                Pair(token, sessionID)
-//            }.collect { (token, sessionID) ->
-//                if (token.isNotEmpty() && sessionID.isNotEmpty()) {
-//                    isLoading = false
-//                    savedToken = token
-//                    savedSessionID = sessionID
-            // 两个参数都已经读取成功，执行进一步操作
-
-//            println("token1: ${savedToken}, sessionID1: ${savedSessionID}")
-//                    CoroutineScope(Dispatchers.Main).launch {
-//                        httpHelper.refreshQrCode(savedToken, savedSessionID).fold(
-//                            onSuccess = { result ->
-//                                bitmap = BitmapFactory.decodeStream(result)
-//                            },
-//                            onFailure = { error ->
-////                                    println("Error: ${e.message}")
-//                            }
-//                        )
-//                    }
             if (savedToken.isNotEmpty() && savedSessionID.isNotEmpty()) {
-
                 val url =
                     "http://ykt.baiyunairport.com/ykt/homepage/qrcode?codeContent=${savedPhyCardId}"
                 val request =
@@ -364,9 +307,6 @@ fun ShowQrCodePage(
                     }
                 })
             }
-//                }
-//            }
-
         }
     }
 

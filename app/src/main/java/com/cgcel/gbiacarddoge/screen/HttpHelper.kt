@@ -1,5 +1,7 @@
 package com.cgcel.gbiacarddoge.screen
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.Call
@@ -89,6 +91,47 @@ class HttpHelper {
             }
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    suspend fun getQrCodeBitmap(
+        savedToken: String,
+        savedSessionID: String,
+        savedPhyCardId: String
+    ): Bitmap? {
+        val url =
+            "http://ykt.baiyunairport.com/ykt/homepage/qrcode?codeContent=${savedPhyCardId}"
+        val request = Request.Builder().url(url)
+            .addHeader("Host", "ykt.baiyunairport.com")
+            .addHeader("Connection", "keep-alive")
+//                .addHeader("Accept", "application/json, text/plain, */*")
+            .addHeader("Accept", "application/octet-stream").addHeader(
+                "Applet-Token", savedToken
+            )
+            .addHeader("Session-ID", savedSessionID).addHeader(
+                "User-Agent",
+                "Mozilla/5.0 (Linux; Android 13; XT2301-5 Build/T1TR33.4-30-36; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/107.0.5304.141 Mobile Safari/537.36 XWEB/5023 MMWEBSDK/20230202 MMWEBID/3522 MicroMessenger/8.0.33.2305(0x28002143) WeChat/arm64 Weixin GPVersion/1 NetType/WIFI Language/zh_CN ABI/arm64"
+            ).addHeader("X-Requested-With", "com.tencent.mm")
+            .addHeader("Referer", "http://ykt.baiyunairport.com/payment")
+            .addHeader("Accept-Encoding", "gzip, deflate")
+            .addHeader(
+                "Accept-Language",
+                "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7"
+            )
+            .addHeader("Cookie", "JSESSIONID=${savedSessionID}").build()
+
+        val spec = ConnectionSpec.Builder(ConnectionSpec.CLEARTEXT).build()
+        val client =
+            OkHttpClient.Builder().connectionSpecs(listOf(spec)).build()
+
+        return withContext(Dispatchers.IO) {
+            val response = client.newCall(request).execute()
+            if (!response.isSuccessful) {
+                null
+            } else {
+                val responseBody = response.body?.byteStream()
+                BitmapFactory.decodeStream(responseBody)
+            }
         }
     }
 }

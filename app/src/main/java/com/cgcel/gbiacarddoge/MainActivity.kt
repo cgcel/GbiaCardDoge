@@ -32,9 +32,10 @@ class MainActivity : ComponentActivity() {
             val savedSessionID = datastore.getUserSessionID.first()
             val savedPhyCardId = datastore.getUserPhyCardId.first()
             val savedUserName = datastore.getUserName.first()
+            val savedUserId = datastore.getUserId.first()
 
             val startDestination =
-                if (savedToken.isNullOrBlank() || savedSessionID.isNullOrBlank() || savedPhyCardId.isNullOrBlank() || savedUserName.isNullOrBlank()) {
+                if (savedToken.isNullOrBlank() || savedSessionID.isNullOrBlank() || savedPhyCardId.isNullOrBlank() || savedUserName.isNullOrBlank() || savedUserId.isNullOrBlank()) {
                     "login"
                 } else {
                     "qrCode"

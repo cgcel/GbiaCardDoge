@@ -39,6 +39,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,6 +56,7 @@ import com.alibaba.fastjson2.JSON
 import com.cgcel.gbiacarddoge.R
 import com.cgcel.gbiacarddoge.datastore.UserStore
 import com.cgcel.gbiacarddoge.ui.theme.BaiyunCardTheme
+import kotlinx.coroutines.launch
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.ConnectionSpec
@@ -62,6 +64,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
+import java.math.BigDecimal
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -75,6 +78,7 @@ fun QrCodePage(navController: NavHostController) {
     val savedSessionID = datastore.getUserSessionID.collectAsState(initial = "")
     val savedPhyCardId = datastore.getUserPhyCardId.collectAsState(initial = "")
     val savedUserName = datastore.getUserName.collectAsState(initial = "")
+    val savedUserId = datastore.getUserId.collectAsState(initial = "")
 
     var allValuesAvailable by remember { mutableStateOf(false) }
 
@@ -82,7 +86,8 @@ fun QrCodePage(navController: NavHostController) {
         allValuesAvailable = savedToken.value.isNotBlank() &&
                 savedSessionID.value.isNotBlank() &&
                 savedPhyCardId.value.isNotBlank() &&
-                savedUserName.value.isNotBlank()
+                savedUserName.value.isNotBlank() &&
+                savedUserId.value.isNotBlank()
     }
 
     // 先这样解决, 否则页面跳转有问题
@@ -90,7 +95,8 @@ fun QrCodePage(navController: NavHostController) {
         allValuesAvailable = savedToken.value.isNotBlank() &&
                 savedSessionID.value.isNotBlank() &&
                 savedPhyCardId.value.isNotBlank() &&
-                savedUserName.value.isNotBlank()
+                savedUserName.value.isNotBlank() &&
+                savedUserId.value.isNotBlank()
     }
 
     if (allValuesAvailable) {
@@ -101,7 +107,8 @@ fun QrCodePage(navController: NavHostController) {
             savedToken = savedToken.value,
             savedSessionID = savedSessionID.value,
             savedPhyCardId = savedPhyCardId.value,
-            savedUserName = savedUserName.value
+            savedUserName = savedUserName.value,
+            savedUserId = savedUserId.value
         )
     } else {
         // 状态值还未全部获取到，可以显示一个加载动画或其他占位符
@@ -116,9 +123,11 @@ fun ShowQrCodePage(
     savedToken: String,
     savedSessionID: String,
     savedPhyCardId: String,
-    savedUserName: String
+    savedUserName: String,
+    savedUserId: String
 ) {
     val context = LocalContext.current
+    val httpHelper = HttpHelper()
 
     var isLogin by remember { mutableStateOf(true) }
 
@@ -130,6 +139,11 @@ fun ShowQrCodePage(
 
     var showFavDialog by remember { mutableStateOf(false) }
     var showInfoDialog by remember { mutableStateOf(false) }
+    var showWalletDialog by remember { mutableStateOf(false) }
+
+    // 记录返回的钱包信息
+    var walletDetails by remember { mutableStateOf("") }
+    var scope  = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -148,7 +162,7 @@ fun ShowQrCodePage(
                     }) {
                         Icon(
                             imageVector = Icons.Filled.Info,
-                            contentDescription = "Localized description"
+                            contentDescription = "Show the App Info"
                         )
                     }
                 },
@@ -159,7 +173,7 @@ fun ShowQrCodePage(
                     }) {
                         Icon(
                             imageVector = Icons.Filled.Favorite,
-                            contentDescription = "Localized description"
+                            contentDescription = "Show the Fav Dialog"
                         )
                     }
                 }
@@ -169,8 +183,17 @@ fun ShowQrCodePage(
         bottomBar = {
             BottomAppBar(
                 actions = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Person, contentDescription = "Logout Button")
+                    IconButton(onClick = {
+                        /* doSomething() */
+                        scope.launch {
+                            val resp = httpHelper.getWalletDetails(savedToken, savedSessionID, savedUserId)
+                            if (resp != null) {
+                                walletDetails = resp
+                                showWalletDialog = true
+                            }
+                        }
+                    }) {
+                        Icon(Icons.Filled.Person, contentDescription = "Get wallet details")
                     }
                     IconButton(onClick = { /* doSomething() */ }) {
                         Icon(
@@ -385,6 +408,36 @@ fun ShowQrCodePage(
             }
         )
     }
+
+    if (showWalletDialog) {
+        val walletObj = JSON.parseObject(walletDetails)
+        var walletStr = ""
+        val walletData = walletObj["data"] as List<Map<String, Any>>
+        for (item in walletData) {
+            val walletType = item["walletType"] as String
+            val money = item["money"] as BigDecimal
+            walletStr += "$walletType：$money 元\n"
+        }
+        AlertDialog(
+            onDismissRequest = { showWalletDialog = false },
+            title = { Text("钱包余额") },
+            text = { Text(walletStr) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showWalletDialog = false
+                    }
+                ) {
+                    Text("好的")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showWalletDialog = false }) {
+                    Text("关闭")
+                }
+            }
+        )
+    }
 }
 
 @Preview(showBackground = true)
@@ -401,6 +454,6 @@ fun QrCodePagePreview() {
 fun ShowQrCodePagePreview() {
     val navController = rememberNavController()
     BaiyunCardTheme {
-        ShowQrCodePage(navController, "", "", "", "")
+        ShowQrCodePage(navController, "", "", "", "", "")
     }
 }

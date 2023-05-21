@@ -3,7 +3,6 @@ package com.cgcel.gbiacarddoge.screen
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -57,18 +56,10 @@ import com.cgcel.gbiacarddoge.R
 import com.cgcel.gbiacarddoge.datastore.UserStore
 import com.cgcel.gbiacarddoge.ui.theme.BaiyunCardTheme
 import kotlinx.coroutines.launch
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.ConnectionSpec
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
-import java.io.IOException
 import java.math.BigDecimal
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QrCodePage(navController: NavHostController) {
     val context = LocalContext.current
@@ -129,21 +120,25 @@ fun ShowQrCodePage(
     val context = LocalContext.current
     val httpHelper = HttpHelper()
 
+    // 记录 isLogin 状态位
     var isLogin by remember { mutableStateOf(true) }
 
     val formatUserName = Util().formatUserName(savedUserName)
 
+    // 记录二维码 bitmap
     var bitmap by remember {
         mutableStateOf(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888))
     }
 
+    // 记录 alertdialog 显示状态位
     var showFavDialog by remember { mutableStateOf(false) }
     var showInfoDialog by remember { mutableStateOf(false) }
     var showWalletDialog by remember { mutableStateOf(false) }
+    var showEditDialog by remember { mutableStateOf(false) }
 
     // 记录返回的钱包信息
     var walletDetails by remember { mutableStateOf("") }
-    var scope  = rememberCoroutineScope()
+    val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -186,7 +181,8 @@ fun ShowQrCodePage(
                     IconButton(onClick = {
                         /* doSomething() */
                         scope.launch {
-                            val resp = httpHelper.getWalletDetails(savedToken, savedSessionID, savedUserId)
+                            val resp =
+                                httpHelper.getWalletDetails(savedToken, savedSessionID, savedUserId)
                             if (resp != null) {
                                 walletDetails = resp
                                 showWalletDialog = true
@@ -195,7 +191,10 @@ fun ShowQrCodePage(
                     }) {
                         Icon(Icons.Filled.Person, contentDescription = "Get wallet details")
                     }
-                    IconButton(onClick = { /* doSomething() */ }) {
+                    IconButton(onClick = {
+                        /* doSomething() */
+                        showEditDialog = true
+                    }) {
                         Icon(
                             Icons.Filled.Edit,
                             contentDescription = "Localized description",
@@ -206,40 +205,13 @@ fun ShowQrCodePage(
                     FloatingActionButton(
                         onClick = {
                             if (savedToken.isNotEmpty() && savedSessionID.isNotEmpty()) {
-                                val url =
-                                    "http://ykt.baiyunairport.com/ykt/homepage/qrcode?codeContent=${savedPhyCardId}"
-                                val request = Request.Builder().url(url)
-                                    .addHeader("Host", "ykt.baiyunairport.com")
-                                    .addHeader("Connection", "keep-alive")
-//                .addHeader("Accept", "application/json, text/plain, */*")
-                                    .addHeader("Accept", "application/octet-stream").addHeader(
-                                        "Applet-Token", savedToken
+                                scope.launch {
+                                    bitmap = httpHelper.getQrCodeBitmap(
+                                        savedToken,
+                                        savedSessionID,
+                                        savedPhyCardId
                                     )
-                                    .addHeader("Session-ID", savedSessionID).addHeader(
-                                        "User-Agent",
-                                        "Mozilla/5.0 (Linux; Android 13; XT2301-5 Build/T1TR33.4-30-36; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/107.0.5304.141 Mobile Safari/537.36 XWEB/5023 MMWEBSDK/20230202 MMWEBID/3522 MicroMessenger/8.0.33.2305(0x28002143) WeChat/arm64 Weixin GPVersion/1 NetType/WIFI Language/zh_CN ABI/arm64"
-                                    ).addHeader("X-Requested-With", "com.tencent.mm")
-                                    .addHeader("Referer", "http://ykt.baiyunairport.com/payment")
-                                    .addHeader("Accept-Encoding", "gzip, deflate")
-                                    .addHeader(
-                                        "Accept-Language",
-                                        "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7"
-                                    )
-                                    .addHeader("Cookie", "JSESSIONID=${savedSessionID}").build()
-
-                                val spec = ConnectionSpec.Builder(ConnectionSpec.CLEARTEXT).build()
-                                val client =
-                                    OkHttpClient.Builder().connectionSpecs(listOf(spec)).build()
-                                client.newCall(request).enqueue(object : Callback {
-                                    override fun onResponse(call: Call, response: Response) {
-                                        val responseBody = response.body?.byteStream()
-                                        bitmap = BitmapFactory.decodeStream(responseBody)
-                                    }
-
-                                    override fun onFailure(call: Call, e: IOException) {
-                                        println("Error: ${e.message}")
-                                    }
-                                })
+                                }
                             }
 
                         },
@@ -257,38 +229,7 @@ fun ShowQrCodePage(
 
     LaunchedEffect(Unit) {
         if (savedToken.isNotEmpty() && savedSessionID.isNotEmpty()) {
-            val url = "http://ykt.baiyunairport.com/ykt/orderFood/showOrderFood"
-            val request =
-                Request.Builder().url(url).addHeader("Host", "ykt.baiyunairport.com")
-                    .addHeader("Connection", "keep-alive")
-                    .addHeader("Accept", "application/json, text/plain, */*").addHeader(
-                        "Applet-Token", savedToken
-                    ).addHeader("Session-ID", savedSessionID).addHeader(
-                        "User-Agent",
-                        "Mozilla/5.0 (Linux; Android 13; XT2301-5 Build/T1TR33.4-30-36; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/107.0.5304.141 Mobile Safari/537.36 XWEB/5023 MMWEBSDK/20230202 MMWEBID/3522 MicroMessenger/8.0.33.2305(0x28002143) WeChat/arm64 Weixin GPVersion/1 NetType/WIFI Language/zh_CN ABI/arm64"
-                    ).addHeader("X-Requested-With", "com.tencent.mm")
-                    .addHeader("Referer", "http://ykt.baiyunairport.com/payment")
-                    .addHeader("Accept-Encoding", "gzip, deflate")
-                    .addHeader("Accept-Language", "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7")
-                    .addHeader("Cookie", "JSESSIONID=${savedSessionID}").build()
-
-            val spec = ConnectionSpec.Builder(ConnectionSpec.CLEARTEXT).build()
-            val client = OkHttpClient.Builder().connectionSpecs(listOf(spec)).build()
-            client.newCall(request).enqueue(object : Callback {
-                override fun onResponse(call: Call, response: Response) {
-                    val responseBody = response.body?.string()
-                    val jsonData = JSON.parseObject(responseBody) // JSONObject
-                    val code = jsonData.getIntValue("code")
-                    println("responseBody: $responseBody")
-                    if (code != 200) {
-                        isLogin = false
-                    }
-                }
-
-                override fun onFailure(call: Call, e: IOException) {
-                    println("Error: ${e.message}")
-                }
-            })
+            isLogin = httpHelper.checkIsLogin(savedToken, savedSessionID)
         } else {
             isLogin = false
         }
@@ -300,35 +241,9 @@ fun ShowQrCodePage(
             navController.navigate("login")
         } else {
             if (savedToken.isNotEmpty() && savedSessionID.isNotEmpty()) {
-                val url =
-                    "http://ykt.baiyunairport.com/ykt/homepage/qrcode?codeContent=${savedPhyCardId}"
-                val request =
-                    Request.Builder().url(url).addHeader("Host", "ykt.baiyunairport.com")
-                        .addHeader("Connection", "keep-alive")
-//                .addHeader("Accept", "application/json, text/plain, */*")
-                        .addHeader("Accept", "application/octet-stream").addHeader(
-                            "Applet-Token", savedToken
-                        ).addHeader("Session-ID", savedSessionID).addHeader(
-                            "User-Agent",
-                            "Mozilla/5.0 (Linux; Android 13; XT2301-5 Build/T1TR33.4-30-36; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/107.0.5304.141 Mobile Safari/537.36 XWEB/5023 MMWEBSDK/20230202 MMWEBID/3522 MicroMessenger/8.0.33.2305(0x28002143) WeChat/arm64 Weixin GPVersion/1 NetType/WIFI Language/zh_CN ABI/arm64"
-                        ).addHeader("X-Requested-With", "com.tencent.mm")
-                        .addHeader("Referer", "http://ykt.baiyunairport.com/payment")
-                        .addHeader("Accept-Encoding", "gzip, deflate")
-                        .addHeader("Accept-Language", "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7")
-                        .addHeader("Cookie", "JSESSIONID=${savedSessionID}").build()
-
-                val spec = ConnectionSpec.Builder(ConnectionSpec.CLEARTEXT).build()
-                val client = OkHttpClient.Builder().connectionSpecs(listOf(spec)).build()
-                client.newCall(request).enqueue(object : Callback {
-                    override fun onResponse(call: Call, response: Response) {
-                        val responseBody = response.body?.byteStream()
-                        bitmap = BitmapFactory.decodeStream(responseBody)
-                    }
-
-                    override fun onFailure(call: Call, e: IOException) {
-                        println("Error: ${e.message}")
-                    }
-                })
+                scope.launch {
+                    bitmap = httpHelper.getQrCodeBitmap(savedToken, savedSessionID, savedPhyCardId)
+                }
             }
         }
     }
@@ -433,6 +348,28 @@ fun ShowQrCodePage(
             },
             dismissButton = {
                 TextButton(onClick = { showWalletDialog = false }) {
+                    Text("关闭")
+                }
+            }
+        )
+    }
+
+    if (showEditDialog) {
+        AlertDialog(
+            onDismissRequest = { showEditDialog = false },
+//            title = { Text("施工中...") },
+            text = { Text("施工中...") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showEditDialog = false
+                    }
+                ) {
+                    Text("好的")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showEditDialog = false }) {
                     Text("关闭")
                 }
             }

@@ -1,6 +1,9 @@
 package com.cgcel.gbiacarddoge.screen
 
 class Util {
+    /*
+    * 姓名打码
+    * */
     fun formatUserName(userName: String): String {
         val formattedName = when {
             userName.length == 2 -> userName.replaceRange(1, 2, "*")

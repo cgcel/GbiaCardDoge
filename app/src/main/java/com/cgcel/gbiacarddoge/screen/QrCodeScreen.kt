@@ -282,8 +282,8 @@ fun ShowQrCodePage(
     if (showFavDialog) {
         AlertDialog(
             onDismissRequest = { showFavDialog = false },
-            title = { Text("喜欢这个APP吗?") },
-            text = { Text("给我个Star") },
+            title = { Text(context.getString(R.string.like_this_app)) },
+            text = { Text(context.getString(R.string.ask_for_star)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -293,12 +293,12 @@ fun ShowQrCodePage(
                         showFavDialog = false
                     }
                 ) {
-                    Text("好")
+                    Text(context.getString(R.string.dialog_ok))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showFavDialog = false }) {
-                    Text("下次一定")
+                    Text(context.getString(R.string.dialog_close))
                 }
             }
         )
@@ -307,18 +307,18 @@ fun ShowQrCodePage(
     if (showInfoDialog) {
         AlertDialog(
             onDismissRequest = { showInfoDialog = false },
-            title = { Text("关于本应用") },
-            text = { Text("卡好刷 (Doge)\n使用 Kotlin + Jetpack Compose 构建\nMaterial 3 UI 设计\n极速的亮码体验") },
+            title = { Text(context.getString(R.string.about_app)) },
+            text = { Text(context.getString(R.string.app_name_without_emoji) + " - " + context.getString(R.string.app_version) + "\n" + context.getString(R.string.app_desc)) },
             confirmButton = {
                 TextButton(
                     onClick = { showInfoDialog = false }
                 ) {
-                    Text("好的")
+                    Text(context.getString(R.string.dialog_ok))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showInfoDialog = false }) {
-                    Text("关闭")
+                    Text(context.getString(R.string.dialog_close))
                 }
             }
         )
@@ -335,7 +335,7 @@ fun ShowQrCodePage(
         }
         AlertDialog(
             onDismissRequest = { showWalletDialog = false },
-            title = { Text("钱包余额") },
+            title = { Text(context.getString(R.string.wallet_details_title)) },
             text = { Text(walletStr) },
             confirmButton = {
                 TextButton(
@@ -343,12 +343,12 @@ fun ShowQrCodePage(
                         showWalletDialog = false
                     }
                 ) {
-                    Text("好的")
+                    Text(context.getString(R.string.dialog_ok))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showWalletDialog = false }) {
-                    Text("关闭")
+                    Text(context.getString(R.string.dialog_close))
                 }
             }
         )
@@ -358,19 +358,19 @@ fun ShowQrCodePage(
         AlertDialog(
             onDismissRequest = { showEditDialog = false },
 //            title = { Text("施工中...") },
-            text = { Text("施工中...") },
+            text = { Text(context.getString(R.string.unfinished_text)) },
             confirmButton = {
                 TextButton(
                     onClick = {
                         showEditDialog = false
                     }
                 ) {
-                    Text("好的")
+                    Text(context.getString(R.string.dialog_ok))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showEditDialog = false }) {
-                    Text("关闭")
+                    Text(context.getString(R.string.dialog_close))
                 }
             }
         )

@@ -129,12 +129,12 @@ fun LoginPage(navController: NavHostController) {
         OutlinedTextField(
             value = phoneNumber,
             onValueChange = { phoneNumber = it },
-            label = { Text("Phone number") },
+            label = { Text(context.getString(R.string.phone_number_en)) },
             modifier = Modifier.align(Alignment.CenterHorizontally),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
             maxLines = 1,
             singleLine = true,
-            leadingIcon = { Icon(Icons.Filled.Phone, contentDescription = "Localized description") }
+            leadingIcon = { Icon(Icons.Filled.Phone, contentDescription = "PhoneNum OutlinedTextField") }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -142,11 +142,11 @@ fun LoginPage(navController: NavHostController) {
         OutlinedTextField(
             value = verificationCode,
             onValueChange = { verificationCode = it },
-            label = { Text("Verification code") },
+            label = { Text(context.getString(R.string.verification_code_en)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             maxLines = 1,
             singleLine = true,
-            leadingIcon = { Icon(Icons.Filled.Info, contentDescription = "Localized description") }
+            leadingIcon = { Icon(Icons.Filled.Info, contentDescription = "VerificationCode OutlinedTextField") }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -165,7 +165,7 @@ fun LoginPage(navController: NavHostController) {
             if (countdownSeconds > 0) {
                 Text("$countdownSeconds s")
             } else {
-                Text("获取验证码")
+                Text(context.getString(R.string.get_verification_code))
             }
         }
 
@@ -227,7 +227,7 @@ fun LoginPage(navController: NavHostController) {
             if (isLoading) {
                 CircularProgressIndicator()
             } else {
-                Text("登录")
+                Text(context.getString(R.string.login))
             }
         }
 
@@ -249,8 +249,8 @@ fun LoginPage(navController: NavHostController) {
         if (showFavDialog) {
             AlertDialog(
                 onDismissRequest = { showFavDialog = false },
-                title = { Text("喜欢这个APP吗?") },
-                text = { Text("给我个Star") },
+                title = { Text(context.getString(R.string.like_this_app)) },
+                text = { Text(context.getString(R.string.ask_for_star)) },
                 confirmButton = {
                     TextButton(
                         onClick = {
@@ -260,12 +260,12 @@ fun LoginPage(navController: NavHostController) {
                             showFavDialog = false
                         }
                     ) {
-                        Text("好")
+                        Text(context.getString(R.string.dialog_ok))
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { showFavDialog = false }) {
-                        Text("下次一定")
+                        Text(context.getString(R.string.dialog_close))
                     }
                 }
             )
@@ -274,18 +274,18 @@ fun LoginPage(navController: NavHostController) {
         if (showInfoDialog) {
             AlertDialog(
                 onDismissRequest = { showInfoDialog = false },
-                title = { Text("关于本应用") },
-                text = { Text("卡好刷 (Doge)\n使用 Kotlin + Jetpack Compose 构建\nMaterial 3 UI 设计\n极速的亮码体验") },
+                title = { Text(context.getString(R.string.about_app)) },
+                text = { Text(context.getString(R.string.app_name_without_emoji) + " - " + context.getString(R.string.app_version) + "\n" + context.getString(R.string.app_desc)) },
                 confirmButton = {
                     TextButton(
                         onClick = { showInfoDialog = false }
                     ) {
-                        Text("好的")
+                        Text(context.getString(R.string.dialog_ok))
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { showInfoDialog = false }) {
-                        Text("关闭")
+                        Text(context.getString(R.string.dialog_close))
                     }
                 }
             )

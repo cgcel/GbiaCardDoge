@@ -1,6 +1,20 @@
 <resources>
     <string name="app_name">卡好刷🐶</string>
+    <string name="app_name_without_emoji">卡好刷 (Doge)</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="title_activity_qr_code">QrCodeActivity</string>
     <string name="project_url">https://github.com/cgcel/GbiaCardDoge</string>
+    <string name="about_app">关于本应用</string>
+    <string name="app_version">v1.0.1</string>
+    <string name="app_desc">使用 Kotlin + Jetpack Compose 构建\n遵循 Material You UI 设计\n极速的一卡通亮码体验</string>
+    <string name="dialog_ok">好的</string>
+    <string name="dialog_close">关闭</string>
+    <string name="like_this_app">喜欢这个APP吗?</string>
+    <string name="ask_for_star">给我个Star</string>
+    <string name="get_verification_code">获取验证码</string>
+    <string name="login">登录</string>
+    <string name="wallet_details_title">钱包余额</string>
+    <string name="unfinished_text">施工中</string>
+    <string name="phone_number_en">Phone number</string>
+    <string name="verification_code_en">Verification code</string>
 </resources>

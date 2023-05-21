@@ -187,7 +187,7 @@ fun LoginPage(navController: NavHostController) {
                             val decodePayloadJson = JSON.parseObject(decodedPayloadString)
                             val phyCardId = decodePayloadJson?.getString("physicalCardId")
                             val userName = decodePayloadJson?.getString("userName")
-                            val userId = decodePayloadJson?.getString("userId")
+                            val userId = decodePayloadJson?.getString("id")
                             val sessionID =
                                 respJsonData.getJSONObject("data").getString("sessionID")
                             val code = respJsonData.getIntValue("code")

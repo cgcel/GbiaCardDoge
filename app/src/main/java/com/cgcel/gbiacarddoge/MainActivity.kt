@@ -2,6 +2,7 @@ package com.cgcel.gbiacarddoge
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -46,6 +47,8 @@ class MainActivity : ComponentActivity() {
                     }
 
                 setContent {
+                    BackHandler(enabled = false) {
+                    }
                     val navController = rememberNavController()
                     BaiyunCardTheme {
                         // A surface container using the 'background' color from the theme

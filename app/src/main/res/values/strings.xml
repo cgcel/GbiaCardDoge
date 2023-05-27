@@ -5,7 +5,7 @@
     <string name="title_activity_qr_code">QrCodeActivity</string>
     <string name="project_url">https://github.com/cgcel/GbiaCardDoge</string>
     <string name="about_app">关于本应用</string>
-    <string name="app_version">v1.0.1</string>
+    <string name="app_version">v1.0.2</string>
     <string name="app_desc">使用 Kotlin + Jetpack Compose 构建\n遵循 Material You UI 设计\n极速的一卡通亮码体验</string>
     <string name="dialog_ok">好的</string>
     <string name="dialog_close">关闭</string>

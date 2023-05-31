@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="example_shortcut"
+        android:enabled="true"
+        android:icon="@drawable/black_icon"
+        android:shortcutShortLabel="@string/shortcut_short_label"
+        android:shortcutLongLabel="@string/shortcut_long_label"
+        android:shortcutDisabledMessage="@string/shortcut_disabled_message">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.cgcel.gbiacarddoge"
+            android:targetClass="com.cgcel.gbiacarddoge.QrCodeShortcutActivity" />
+    </shortcut>
+</shortcuts>

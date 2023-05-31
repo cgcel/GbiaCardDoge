@@ -17,4 +17,7 @@
     <string name="unfinished_text">施工中</string>
     <string name="phone_number_en">Phone number</string>
     <string name="verification_code_en">Verification code</string>
+    <string name="shortcut_short_label">亮码</string>
+    <string name="shortcut_long_label">打开二维码</string>
+    <string name="shortcut_disabled_message">Shortcut closed</string>
 </resources>

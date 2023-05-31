@@ -103,6 +103,7 @@ fun QrCodePage(navController: NavHostController) {
         )
     } else {
         // 状态值还未全部获取到，可以显示一个加载动画或其他占位符
+        navController.navigate("login")
     }
 }
 

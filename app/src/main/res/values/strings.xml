@@ -20,4 +20,10 @@
     <string name="shortcut_short_label">亮码</string>
     <string name="shortcut_long_label">打开二维码</string>
     <string name="shortcut_disabled_message">Shortcut closed</string>
+    <string name="settings_page_title">设置</string>
+    <string name="qrcode_page_icon_text">二维码</string>
+    <string name="wallet_page_icon_text">钱包</string>
+    <string name="helping_page_icon_text">代刷</string>
+    <string name="settings_page_icon_text">设置</string>
+    <string name="logout_text">退出登录</string>
 </resources>

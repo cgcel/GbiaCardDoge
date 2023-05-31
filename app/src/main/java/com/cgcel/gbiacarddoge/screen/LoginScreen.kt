@@ -47,8 +47,6 @@ import com.alibaba.fastjson2.JSON
 import com.cgcel.gbiacarddoge.R
 import com.cgcel.gbiacarddoge.datastore.UserStore
 import com.cgcel.gbiacarddoge.ui.theme.BaiyunCardTheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.nio.charset.StandardCharsets
@@ -67,9 +65,6 @@ fun LoginPage(navController: NavHostController) {
     var verificationCode by remember { mutableStateOf("") }
 
     var isLogin by remember { mutableStateOf(false) }
-    var loginRespMsg by remember {
-        mutableStateOf("")
-    }
 
     val httpHelper = HttpHelper()
     var countdownSeconds by remember { mutableStateOf(0) }
@@ -175,49 +170,36 @@ fun LoginPage(navController: NavHostController) {
         Button(
             onClick = {
                 isLoading = true
-                CoroutineScope(Dispatchers.Main).launch {
-                    httpHelper.login(phoneNumber, verificationCode).fold(
-                        onSuccess = { result ->
-                            val respJsonData = JSON.parseObject(result) // JSONObject
-                            val token = respJsonData.getJSONObject("data").getString("token")
-                            val payloadData = token.split(".")[1]
-                            val decodedPayloadBytes = Base64.getUrlDecoder().decode(payloadData)
-                            val decodedPayloadString =
-                                String(decodedPayloadBytes, StandardCharsets.UTF_8)
-                            val decodePayloadJson = JSON.parseObject(decodedPayloadString)
-                            val phyCardId = decodePayloadJson?.getString("physicalCardId")
-                            val userName = decodePayloadJson?.getString("userName")
-                            val userId = decodePayloadJson?.getString("id")
-                            val sessionID =
-                                respJsonData.getJSONObject("data").getString("sessionID")
-                            val code = respJsonData.getIntValue("code")
 
-                            scope.launch {
-                                datastore.saveUserToken(token)
-                                datastore.saveUserSessionID(sessionID)
-                                if (phyCardId != null) {
-                                    datastore.saveUserPhyCardId(phyCardId)
-                                }
-                                if (userName != null) {
-                                    datastore.saveUserName(userName)
-                                }
-                                if (userId != null){
-                                    datastore.saveUserId(userId)
-                                }
-                            }
-
-                            if (code == 200) {
-                                // Use the coroutine scope to launch a new coroutine on the main thread
-                                isLogin = true
-                            } else if (code == 400) {
-                                loginRespMsg = respJsonData.getString("message")
-                            }
-                        },
-                        onFailure = { error ->
-                            loginRespMsg = error.message ?: "Unknown Error"
+                scope.launch {
+                    val loginRes = httpHelper.login(phoneNumber, verificationCode)
+                    val respJsonData = JSON.parseObject(loginRes) // JSONObject
+                    val token = respJsonData.getJSONObject("data").getString("token")
+                    val payloadData = token.split(".")[1]
+                    val decodedPayloadBytes = Base64.getUrlDecoder().decode(payloadData)
+                    val decodedPayloadString =
+                        String(decodedPayloadBytes, StandardCharsets.UTF_8)
+                    val decodePayloadJson = JSON.parseObject(decodedPayloadString)
+                    val phyCardId = decodePayloadJson?.getString("physicalCardId")
+                    val userName = decodePayloadJson?.getString("userName")
+                    val userId = decodePayloadJson?.getString("id")
+                    val sessionID =
+                        respJsonData.getJSONObject("data").getString("sessionID")
+                    scope.launch{
+                        datastore.saveUserToken(token)
+                        datastore.saveUserSessionID(sessionID)
+                        if (phyCardId != null) {
+                            datastore.saveUserPhyCardId(phyCardId)
                         }
-                    )
-                    isLoading = false
+                        if (userName != null) {
+                            datastore.saveUserName(userName)
+                        }
+                        if (userId != null){
+                            datastore.saveUserId(userId)
+                        }
+                        isLogin = true
+                        isLoading = false
+                    }
                 }
             },
             enabled = !isLoading,

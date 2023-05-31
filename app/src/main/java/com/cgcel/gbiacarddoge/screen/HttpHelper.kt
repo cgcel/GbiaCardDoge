@@ -46,7 +46,7 @@ class HttpHelper {
     /*
     * 登录函数
     * */
-    suspend fun login(phoneNumber: String, verificationCode: String): Result<String> {
+    suspend fun login(phoneNumber: String, verificationCode: String): String? {
         val url = "http://ykt.baiyunairport.com/ykt/appletlogin/phoneLogin"
 
         val mediaType = "application/json;charset=UTF-8".toMediaTypeOrNull()
@@ -78,20 +78,14 @@ class HttpHelper {
         val client = OkHttpClient.Builder()
             .connectionSpecs(listOf(spec))
             .build()
-        return try {
-            val response = withContext(Dispatchers.IO) {
-                client.newCall(request).execute()
-            }
-
-            if (response.isSuccessful) {
-                val result = response.body?.string() ?: ""
-                Result.success(result)
+        return withContext(Dispatchers.IO) {
+            val response = client.newCall(request).execute()
+            if (!response.isSuccessful) {
+                ""
             } else {
-                val errorBody = response.body?.string() ?: "Unknown Error"
-                Result.failure(Exception(errorBody))
+                val responseBody = response.body?.string()
+                responseBody
             }
-        } catch (e: Exception) {
-            Result.failure(e)
         }
     }
 

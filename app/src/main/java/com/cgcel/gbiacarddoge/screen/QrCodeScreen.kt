@@ -11,15 +11,17 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -28,6 +30,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -103,7 +107,7 @@ fun QrCodePage(navController: NavHostController) {
         )
     } else {
         // 状态值还未全部获取到，可以显示一个加载动画或其他占位符
-        navController.navigate("login")
+//        navController.navigate("login")
     }
 }
 
@@ -141,6 +145,14 @@ fun ShowQrCodePage(
     var walletDetails by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
 
+    var selectedItem by remember { mutableStateOf(0) }
+    val items = listOf(
+        context.getString(R.string.qrcode_page_icon_text),
+        context.getString(R.string.wallet_page_icon_text),
+        context.getString(R.string.helping_page_icon_text),
+        context.getString(R.string.settings_page_icon_text),
+    )
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -171,55 +183,6 @@ fun ShowQrCodePage(
                             imageVector = Icons.Filled.Favorite,
                             contentDescription = "Show the Fav Dialog"
                         )
-                    }
-                }
-            )
-        },
-
-        bottomBar = {
-            BottomAppBar(
-                actions = {
-                    IconButton(onClick = {
-                        /* doSomething() */
-                        scope.launch {
-                            val resp =
-                                httpHelper.getWalletDetails(savedToken, savedSessionID, savedUserId)
-                            if (resp != null) {
-                                walletDetails = resp
-                                showWalletDialog = true
-                            }
-                        }
-                    }) {
-                        Icon(Icons.Filled.Person, contentDescription = "Get wallet details")
-                    }
-                    IconButton(onClick = {
-                        /* doSomething() */
-                        showEditDialog = true
-                    }) {
-                        Icon(
-                            Icons.Filled.Edit,
-                            contentDescription = "Localized description",
-                        )
-                    }
-                },
-                floatingActionButton = {
-                    FloatingActionButton(
-                        onClick = {
-                            if (savedToken.isNotEmpty() && savedSessionID.isNotEmpty()) {
-                                scope.launch {
-                                    bitmap = httpHelper.getQrCodeBitmap(
-                                        savedToken,
-                                        savedSessionID,
-                                        savedPhyCardId
-                                    )
-                                }
-                            }
-
-                        },
-                        containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
-                        elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
-                    ) {
-                        Icon(Icons.Filled.Refresh, "Localized description")
                     }
                 }
             )
@@ -277,6 +240,66 @@ fun ShowQrCodePage(
                     modifier = Modifier.height(16.dp)
                 )
             }
+        }
+
+        NavigationBar(
+            modifier = Modifier.align(Alignment.BottomCenter)
+        ) {
+            items.forEachIndexed { index, item ->
+                NavigationBarItem(
+                    icon = {
+                        if (index == 0) Icon(Icons.Filled.ShoppingCart, contentDescription = item)
+                        if (index == 1) Icon(Icons.Filled.Person, contentDescription = item)
+                        if (index == 2) Icon(Icons.Filled.AccountBox, contentDescription = item)
+                        if (index == 3) Icon(Icons.Filled.Settings, contentDescription = item)
+                           },
+                    label = { Text(item) },
+                    selected = selectedItem == index,
+                    onClick = { selectedItem = index }
+                )
+            }
+        }
+
+        FloatingActionButton(
+            modifier = Modifier
+                .align(Alignment.BottomEnd) // Align to bottom end
+                .offset(x = (-15).dp, y = (-100).dp), // Offset by NavigationBar height
+            onClick = {
+                if (savedToken.isNotEmpty() && savedSessionID.isNotEmpty()) {
+                    scope.launch {
+                        bitmap = httpHelper.getQrCodeBitmap(
+                            savedToken,
+                            savedSessionID,
+                            savedPhyCardId
+                        )
+                    }
+                }
+
+            },
+            containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
+            elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
+        ) {
+            Icon(Icons.Filled.Refresh, "Localized description")
+        }
+
+    }
+
+    LaunchedEffect(selectedItem){
+        if (selectedItem == 1){
+            scope.launch {
+                val resp =
+                    httpHelper.getWalletDetails(savedToken, savedSessionID, savedUserId)
+                if (resp != null) {
+                    walletDetails = resp
+                    showWalletDialog = true
+                }
+            }
+        }
+        if (selectedItem == 2){
+            showEditDialog = true
+        }
+        if (selectedItem == 3){
+            navController.navigate("settings")
         }
     }
 
@@ -378,14 +401,14 @@ fun ShowQrCodePage(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun QrCodePagePreview() {
-    val navController = rememberNavController()
-    BaiyunCardTheme {
-        QrCodePage(navController)
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun QrCodePagePreview() {
+//    val navController = rememberNavController()
+//    BaiyunCardTheme {
+//        QrCodePage(navController)
+//    }
+//}
 
 @Preview(showBackground = true)
 @Composable

@@ -19,6 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import com.cgcel.gbiacarddoge.datastore.UserStore
 import com.cgcel.gbiacarddoge.screen.LoginPage
 import com.cgcel.gbiacarddoge.screen.QrCodePage
+import com.cgcel.gbiacarddoge.screen.SettingsPage
 import com.cgcel.gbiacarddoge.ui.theme.BaiyunCardTheme
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -77,6 +78,9 @@ fun MyNavHost(navController: NavHostController, startDestination: String) {
         }
         composable("qrCode") {
             QrCodePage(navController)
+        }
+        composable("settings"){
+            SettingsPage(navController)
         }
     }
 }

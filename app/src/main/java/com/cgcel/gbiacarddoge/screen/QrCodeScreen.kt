@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Favorite
@@ -30,6 +31,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -50,9 +52,11 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.alibaba.fastjson2.JSON
@@ -153,15 +157,30 @@ fun ShowQrCodePage(
         context.getString(R.string.settings_page_icon_text),
     )
 
+    var pressedIconsCount by remember {mutableStateOf(0)}
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text(
-                        LocalContext.current.getString(R.string.app_name) + " - " + formatUserName,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+//                    Text(
+//                        LocalContext.current.getString(R.string.app_name) + " - " + formatUserName,
+//                        maxLines = 1,
+//                        overflow = TextOverflow.Ellipsis,
+//                        color = MaterialTheme.colorScheme.primary
+//                    ),
+                    ClickableText(
+                        AnnotatedString(context.getString(R.string.app_name) + " - " + formatUserName),
+                        style = TextStyle(
+                            color = MaterialTheme.colorScheme.primary,
+                            fontSize = 22.sp
+                        ),
+                        onClick = {
+                            // 点击文本时的处理逻辑
+                            pressedIconsCount ++
+                        }
                     )
+
                 },
                 navigationIcon = {
                     IconButton(onClick = {
@@ -300,6 +319,12 @@ fun ShowQrCodePage(
         }
         if (selectedItem == 3){
             navController.navigate("settings")
+        }
+    }
+
+    LaunchedEffect(pressedIconsCount){
+        if (pressedIconsCount == 5){
+            navController.navigate("backDoor")
         }
     }
 

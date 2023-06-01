@@ -17,6 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.cgcel.gbiacarddoge.datastore.UserStore
+import com.cgcel.gbiacarddoge.screen.BackDoorPage
 import com.cgcel.gbiacarddoge.screen.LoginPage
 import com.cgcel.gbiacarddoge.screen.QrCodePage
 import com.cgcel.gbiacarddoge.screen.SettingsPage
@@ -81,6 +82,9 @@ fun MyNavHost(navController: NavHostController, startDestination: String) {
         }
         composable("settings"){
             SettingsPage(navController)
+        }
+        composable("backDoor"){
+            BackDoorPage(navController)
         }
     }
 }

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -37,10 +38,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.alibaba.fastjson2.JSON
@@ -74,14 +77,22 @@ fun LoginPage(navController: NavHostController) {
     var showFavDialog by remember { mutableStateOf(false) }
     var showInfoDialog by remember { mutableStateOf(false) }
 
+    var pressedIconsCount by remember {mutableStateOf(0)}
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text(
-                        LocalContext.current.getString(R.string.app_name),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                    ClickableText(
+                        AnnotatedString(context.getString(R.string.app_name)),
+                        style = TextStyle(
+                            color = MaterialTheme.colorScheme.primary,
+                            fontSize = 22.sp
+                        ),
+                        onClick = {
+                            // 点击文本时的处理逻辑
+                            pressedIconsCount ++
+                        }
                     )
                 },
                 navigationIcon = {
@@ -225,6 +236,12 @@ fun LoginPage(navController: NavHostController) {
             while (countdownSeconds > 0) {
                 delay(1000)
                 countdownSeconds--
+            }
+        }
+
+        LaunchedEffect(pressedIconsCount){
+            if (pressedIconsCount == 5){
+                navController.navigate("backDoor")
             }
         }
 

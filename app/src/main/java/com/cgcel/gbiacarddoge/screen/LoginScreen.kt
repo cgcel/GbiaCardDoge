@@ -127,10 +127,19 @@ fun LoginPage(navController: NavHostController) {
     Column(
         modifier = Modifier
             .padding(16.dp)
+            .padding(top = 50.dp)
             .fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
+        Text(
+            text = "用户登录",
+            color = MaterialTheme.colorScheme.primary,
+            fontSize = 30.sp
+        )
+
+        Spacer(modifier = Modifier.padding(16.dp))
 
         OutlinedTextField(
             value = phoneNumber,
@@ -143,7 +152,7 @@ fun LoginPage(navController: NavHostController) {
             leadingIcon = { Icon(Icons.Filled.Phone, contentDescription = "PhoneNum OutlinedTextField") }
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
             value = verificationCode,
@@ -175,7 +184,7 @@ fun LoginPage(navController: NavHostController) {
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // 登录按键
         Button(

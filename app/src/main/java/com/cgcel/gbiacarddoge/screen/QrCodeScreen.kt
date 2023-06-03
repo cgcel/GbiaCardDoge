@@ -163,12 +163,6 @@ fun ShowQrCodePage(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-//                    Text(
-//                        LocalContext.current.getString(R.string.app_name) + " - " + formatUserName,
-//                        maxLines = 1,
-//                        overflow = TextOverflow.Ellipsis,
-//                        color = MaterialTheme.colorScheme.primary
-//                    ),
                     ClickableText(
                         AnnotatedString(context.getString(R.string.app_name) + " - " + formatUserName),
                         style = TextStyle(
@@ -230,8 +224,6 @@ fun ShowQrCodePage(
             }
         }
     }
-
-
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -425,15 +417,6 @@ fun ShowQrCodePage(
         )
     }
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun QrCodePagePreview() {
-//    val navController = rememberNavController()
-//    BaiyunCardTheme {
-//        QrCodePage(navController)
-//    }
-//}
 
 @Preview(showBackground = true)
 @Composable

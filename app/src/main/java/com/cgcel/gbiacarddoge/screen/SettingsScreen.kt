@@ -187,7 +187,11 @@ fun SettingsPage(
 
     LaunchedEffect(selectedItem){
         if (selectedItem == 0){
-            navController.navigate("qrCode")
+            navController.navigate("qrCode"){
+                popUpTo("settings"){
+                    inclusive = true
+                }
+            }
         }
         if (selectedItem == 1){
             // 获取用户登录信息

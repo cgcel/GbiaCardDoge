@@ -146,7 +146,11 @@ fun QrCodePage(navController: NavHostController) {
             }
 
             if (!isLogin) {
-                navController.navigate("login")
+                navController.navigate("login"){
+                    popUpTo("qrCode"){
+                        inclusive = true
+                    }
+                }
             } else {
                 if (savedToken.isNotBlank() && savedSessionID.isNotBlank()) {
                     scope.launch {
@@ -287,7 +291,11 @@ fun QrCodePage(navController: NavHostController) {
             showEditDialog = true
         }
         if (selectedItem == 3){
-            navController.navigate("settings")
+            navController.navigate("settings"){
+                popUpTo("qrCode"){
+                    inclusive = true
+                }
+            }
         }
     }
 

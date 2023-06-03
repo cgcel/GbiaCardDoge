@@ -134,7 +134,7 @@ fun LoginPage(navController: NavHostController) {
     ) {
 
         Text(
-            text = "用户登录",
+            text = context.getString(R.string.login_page_title),
             color = MaterialTheme.colorScheme.primary,
             fontSize = 30.sp
         )
@@ -235,7 +235,11 @@ fun LoginPage(navController: NavHostController) {
 
         LaunchedEffect(isLogin) {
             if (isLogin) {
-                navController.navigate("qrCode")
+                navController.navigate("qrCode"){
+                    popUpTo("login"){
+                        inclusive = true
+                    }
+                }
             } else {
 //                Toast.makeText(context, loginRespMsg, Toast.LENGTH_SHORT).show()
             }

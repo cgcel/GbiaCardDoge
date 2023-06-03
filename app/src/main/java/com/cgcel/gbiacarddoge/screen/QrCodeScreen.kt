@@ -39,8 +39,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -63,76 +61,48 @@ import com.alibaba.fastjson2.JSON
 import com.cgcel.gbiacarddoge.R
 import com.cgcel.gbiacarddoge.datastore.UserStore
 import com.cgcel.gbiacarddoge.ui.theme.BaiyunCardTheme
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QrCodePage(navController: NavHostController) {
     val context = LocalContext.current
     val datastore = UserStore(context)
-
-    val savedToken = datastore.getUserToken.collectAsState(initial = "")
-    val savedSessionID = datastore.getUserSessionID.collectAsState(initial = "")
-    val savedPhyCardId = datastore.getUserPhyCardId.collectAsState(initial = "")
-    val savedUserName = datastore.getUserName.collectAsState(initial = "")
-    val savedUserId = datastore.getUserId.collectAsState(initial = "")
-
-    var allValuesAvailable by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        allValuesAvailable = savedToken.value.isNotBlank() &&
-                savedSessionID.value.isNotBlank() &&
-                savedPhyCardId.value.isNotBlank() &&
-                savedUserName.value.isNotBlank() &&
-                savedUserId.value.isNotBlank()
-    }
-
-    // 先这样解决, 否则页面跳转有问题
-    SideEffect {
-        allValuesAvailable = savedToken.value.isNotBlank() &&
-                savedSessionID.value.isNotBlank() &&
-                savedPhyCardId.value.isNotBlank() &&
-                savedUserName.value.isNotBlank() &&
-                savedUserId.value.isNotBlank()
-    }
-
-    if (allValuesAvailable) {
-        // 所有状态值都可用，进行渲染
-        // 可以在这里引用上述四个参数进行下一步操作
-        ShowQrCodePage(
-            navController = navController,
-            savedToken = savedToken.value,
-            savedSessionID = savedSessionID.value,
-            savedPhyCardId = savedPhyCardId.value,
-            savedUserName = savedUserName.value,
-            savedUserId = savedUserId.value
-        )
-    } else {
-        // 状态值还未全部获取到，可以显示一个加载动画或其他占位符
-//        navController.navigate("login")
-    }
-}
-
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ShowQrCodePage(
-    navController: NavHostController,
-    savedToken: String,
-    savedSessionID: String,
-    savedPhyCardId: String,
-    savedUserName: String,
-    savedUserId: String
-) {
-    val context = LocalContext.current
     val httpHelper = HttpHelper()
 
     // 记录 isLogin 状态位
     var isLogin by remember { mutableStateOf(true) }
 
-    val formatUserName = Util().formatUserName(savedUserName)
+    var savedToken by remember {
+        mutableStateOf("")
+    }
+    var savedSessionID by remember {
+        mutableStateOf("")
+    }
+    var savedPhyCardId by remember {
+        mutableStateOf("")
+    }
+    var savedUserName by remember {
+        mutableStateOf("")
+    }
+    var savedUserId by remember {
+        mutableStateOf("")
+    }
+    var formatUserName by remember {
+        mutableStateOf("")
+    }
+
+//    val savedToken = datastore.getUserToken.collectAsState(initial = "")
+//    val savedSessionID = datastore.getUserSessionID.collectAsState(initial = "")
+//    val savedPhyCardId = datastore.getUserPhyCardId.collectAsState(initial = "")
+//    val savedUserName = datastore.getUserName.collectAsState(initial = "")
+//    val savedUserId = datastore.getUserId.collectAsState(initial = "")
+
+//    formatUserName = Util().formatUserName(savedUserName)
 
     // 记录二维码 bitmap
     var bitmap by remember {
@@ -158,6 +128,34 @@ fun ShowQrCodePage(
     )
 
     var pressedIconsCount by remember {mutableStateOf(0)}
+
+    // 进入页面时首先检查 token 是否有效
+    LaunchedEffect(Unit){
+        scope.launch {
+            savedToken = datastore.getUserToken.first()
+            savedSessionID = datastore.getUserSessionID.first()
+            savedPhyCardId = datastore.getUserPhyCardId.first()
+            savedUserName = datastore.getUserName.first()
+            savedUserId = datastore.getUserId.first()
+            formatUserName = Util().formatUserName(savedUserName)
+
+            if (savedToken.isNotEmpty() && savedSessionID.isNotEmpty()) {
+                isLogin = httpHelper.checkIsLogin(savedToken, savedSessionID)
+            } else {
+                isLogin = false
+            }
+
+            if (!isLogin) {
+                navController.navigate("login")
+            } else {
+                if (savedToken.isNotBlank() && savedSessionID.isNotBlank()) {
+                    scope.launch {
+                        bitmap = httpHelper.getQrCodeBitmap(savedToken, savedSessionID, savedPhyCardId)
+                    }
+                }
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -202,27 +200,6 @@ fun ShowQrCodePage(
         }
     ) {
 
-    }
-
-    LaunchedEffect(Unit) {
-        if (savedToken.isNotEmpty() && savedSessionID.isNotEmpty()) {
-            isLogin = httpHelper.checkIsLogin(savedToken, savedSessionID)
-        } else {
-            isLogin = false
-        }
-    }
-
-
-    LaunchedEffect(isLogin) {
-        if (!isLogin) {
-            navController.navigate("login")
-        } else {
-            if (savedToken.isNotEmpty() && savedSessionID.isNotEmpty()) {
-                scope.launch {
-                    bitmap = httpHelper.getQrCodeBitmap(savedToken, savedSessionID, savedPhyCardId)
-                }
-            }
-        }
     }
 
     Box(
@@ -290,7 +267,7 @@ fun ShowQrCodePage(
             containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
             elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
         ) {
-            Icon(Icons.Filled.Refresh, "Localized description")
+            Icon(Icons.Filled.Refresh, "QrCode Refresh Button")
         }
 
     }
@@ -423,6 +400,6 @@ fun ShowQrCodePage(
 fun ShowQrCodePagePreview() {
     val navController = rememberNavController()
     BaiyunCardTheme {
-        ShowQrCodePage(navController, "", "", "", "", "")
+        QrCodePage(navController)
     }
 }

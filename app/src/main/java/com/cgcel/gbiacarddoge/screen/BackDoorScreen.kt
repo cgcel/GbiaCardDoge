@@ -139,6 +139,7 @@ fun BackDoorPage(
                             datastore.saveUserToken(savedToken)
                             datastore.saveUserSessionID(savedSessionID)
                             Toast.makeText(context, context.getString(R.string.saved_success), Toast.LENGTH_SHORT).show()
+                            navController.navigate("qrCode")
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),

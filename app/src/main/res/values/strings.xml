@@ -26,4 +26,12 @@
     <string name="helping_page_icon_text">代刷</string>
     <string name="settings_page_icon_text">设置</string>
     <string name="logout_text">退出登录</string>
+    <string name="saving_button">保存</string>
+    <string name="user_token">Token</string>
+    <string name="user_session_id">SessionID</string>
+    <string name="debug_screen_title">调试页面</string>
+    <string name="input_user_token">输入用户配置</string>
+    <string name="copy_user_token">复制用户配置</string>
+    <string name="copy_button">复制</string>
+    <string name="saved_success">保存成功</string>
 </resources>

@@ -73,7 +73,7 @@ fun BackDoorPage(
                 navigationIcon = {
                     IconButton(onClick = {
                         /* doSomething() */
-                        navController.navigate("qrCode")
+                        navController.popBackStack()
                     }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
@@ -141,6 +141,9 @@ fun BackDoorPage(
                             Toast.makeText(context, context.getString(R.string.saved_success), Toast.LENGTH_SHORT).show()
                             navController.navigate("qrCode"){
                                 popUpTo("backDoor"){
+                                    inclusive = true
+                                }
+                                popUpTo("login"){
                                     inclusive = true
                                 }
                             }

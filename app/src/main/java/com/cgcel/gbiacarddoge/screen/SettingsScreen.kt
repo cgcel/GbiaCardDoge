@@ -68,6 +68,7 @@ fun SettingsPage(
     var showInfoDialog by remember { mutableStateOf(false) }
     var showWalletDialog by remember { mutableStateOf(false) }
     var showEditDialog by remember { mutableStateOf(false) }
+    var showLogoutDialog by remember { mutableStateOf(false) }
 
     var savedToken by remember { mutableStateOf("") }
     var savedSessionID by remember { mutableStateOf("") }
@@ -121,9 +122,11 @@ fun SettingsPage(
             )
         },
     ) {
-        Column(modifier = Modifier
-            .padding(vertical = 80.dp, horizontal = 15.dp)
-            .fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .padding(vertical = 80.dp, horizontal = 15.dp)
+                .fillMaxWidth()
+        ) {
 
             Card(
                 onClick = { /* Do something */ },
@@ -132,17 +135,22 @@ fun SettingsPage(
                     .height(80.dp)
             ) {
                 Box(Modifier.fillMaxSize()) {
-                    Text(context.getString(R.string.about_app),
+                    Text(
+                        context.getString(R.string.about_app),
                         Modifier
                             .align(Alignment.CenterStart)
-                            .padding(15.dp))
+                            .padding(15.dp)
+                    )
                 }
             }
 
             Spacer(modifier = Modifier.height(15.dp))
 
             Card(
-                onClick = { /* Do something */ },
+                onClick = {
+                    /* Do something */
+                    showLogoutDialog = true
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(80.dp)
@@ -182,18 +190,18 @@ fun SettingsPage(
                 )
             }
         }
-        
+
     }
 
-    LaunchedEffect(selectedItem){
-        if (selectedItem == 0){
-            navController.navigate("qrCode"){
-                popUpTo("settings"){
+    LaunchedEffect(selectedItem) {
+        if (selectedItem == 0) {
+            navController.navigate("qrCode") {
+                popUpTo("settings") {
                     inclusive = true
                 }
             }
         }
-        if (selectedItem == 1){
+        if (selectedItem == 1) {
             // 获取用户登录信息
             scope.launch {
                 savedToken = datastore.getUserToken.first()
@@ -211,7 +219,7 @@ fun SettingsPage(
                 }
             }
         }
-        if (selectedItem == 2){
+        if (selectedItem == 2) {
             showEditDialog = true
         }
     }
@@ -245,7 +253,13 @@ fun SettingsPage(
         AlertDialog(
             onDismissRequest = { showInfoDialog = false },
             title = { Text(context.getString(R.string.about_app)) },
-            text = { Text(context.getString(R.string.app_name_without_emoji) + " - " + context.getString(R.string.app_version) + "\n" + context.getString(R.string.app_desc)) },
+            text = {
+                Text(
+                    context.getString(R.string.app_name_without_emoji) + " - " + context.getString(
+                        R.string.app_version
+                    ) + "\n" + context.getString(R.string.app_desc)
+                )
+            },
             confirmButton = {
                 TextButton(
                     onClick = { showInfoDialog = false }
@@ -294,7 +308,7 @@ fun SettingsPage(
     if (showEditDialog) {
         AlertDialog(
             onDismissRequest = { showEditDialog = false },
-//            title = { Text("施工中...") },
+            title = { Text(context.getString(R.string.helping_page_title)) },
             text = { Text(context.getString(R.string.unfinished_text)) },
             confirmButton = {
                 TextButton(
@@ -308,6 +322,41 @@ fun SettingsPage(
             dismissButton = {
                 TextButton(onClick = { showEditDialog = false }) {
                     Text(context.getString(R.string.dialog_close))
+                }
+            }
+        )
+    }
+
+    if (showLogoutDialog) {
+        AlertDialog(
+            onDismissRequest = { showLogoutDialog = false },
+//            title = { Text("施工中...") },
+            text = { Text(context.getString(R.string.logout_reconfirm_text)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        // 通过清除用户 token 等信息退出登录, 然后跳转到登录页
+                        scope.launch {
+                            datastore.saveUserToken("")
+                            datastore.saveUserSessionID("")
+                            datastore.saveUserPhyCardId("")
+                            datastore.saveUserName("")
+                            datastore.saveUserId("")
+                        }
+                        showLogoutDialog = false
+                        navController.navigate("login"){
+                            popUpTo("settings"){
+                                inclusive = true
+                            }
+                        }
+                    }
+                ) {
+                    Text(context.getString(R.string.confirm_button))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLogoutDialog = false }) {
+                    Text(context.getString(R.string.cancel_button))
                 }
             }
         )

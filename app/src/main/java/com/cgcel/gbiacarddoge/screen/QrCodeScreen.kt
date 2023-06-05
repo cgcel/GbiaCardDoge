@@ -383,7 +383,7 @@ fun QrCodePage(navController: NavHostController) {
     if (showEditDialog) {
         AlertDialog(
             onDismissRequest = { showEditDialog = false },
-//            title = { Text("施工中...") },
+            title = { Text(context.getString(R.string.helping_page_title)) },
             text = { Text(context.getString(R.string.unfinished_text)) },
             confirmButton = {
                 TextButton(
